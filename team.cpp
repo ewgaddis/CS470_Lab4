@@ -7,9 +7,11 @@
 #include "dumbAgent.h"
 #include "pdAgent.h"
 #include "searchAgent.h"
-#include "gridWindow.h"
-#include "occGrid.h"
+//#include "gridWindow.h"
+//#include "occGrid.h"
 #include "scoutAgent.h"
+#include "lineAgent.h"
+#include "crazyAgent.h"
 
 #include <vector>
 #include <conio.h>
@@ -18,20 +20,19 @@ using namespace std;
 
 BZRC *team;
 
-OCCGrid *grid;
-ScoutAgent *scout1;
-ScoutAgent *scout2;
-ScoutAgent *scout3;
-ScoutAgent *scout4;
-ScoutAgent *scout5;
+//OCCGrid *grid;
+LineAgent *line1;
+CrazyAgent *crazy1;
 
-double trueNeg;
-double truePos;
+//double trueNeg;
+//double truePos;
 
 void world_init(BZRC *my_team)
 {
 	team = my_team;
-	vector<constant_t> constants;
+	//line1 = new LineAgent(team, 0);
+	crazy1 = new CrazyAgent(team, 0);
+	/*vector<constant_t> constants;
 	team->get_constants(&constants);
 	for each(constant_t c in constants){
 		if (c.name.compare("truenegative") == 0){
@@ -52,6 +53,7 @@ void world_init(BZRC *my_team)
 	scout5 = new ScoutAgent(team, 4, "upper");
 
 	grid = new OCCGrid(team, 800, 0.5, truePos, trueNeg);
+	*/
 }
 
 void robot_pre_update()
@@ -60,7 +62,9 @@ void robot_pre_update()
 
 bool robot_update()
 {
-	grid->update(0);
+	//line1->Update();
+	crazy1->Update();
+	/*grid->update(0);
 	grid->update(1);
 	grid->update(2);
 	grid->update(3);
@@ -87,7 +91,7 @@ bool robot_update()
 	scout2->Update(obstacles, grid);
 	scout3->Update(obstacles, grid);
 	scout4->Update(obstacles, grid);
-	scout5->Update(obstacles, grid);
+	scout5->Update(obstacles, grid);*/
 
 	return true;
 }
