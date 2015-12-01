@@ -1,6 +1,7 @@
 #include "scoutAgent.h"
 #include "geometry.h"
 #include <math.h>
+#include <float.h>
 using namespace std;
 ScoutAgent::ScoutAgent(BZRC* team, int index,string area){
 	myTeam = team;
@@ -82,8 +83,8 @@ void ScoutAgent::Update(vector <obstacle_t> obstacles, OCCGrid * grid){
 		}
 		double ** g = grid->getGrid();
 		boolean curIn = isInObstacle(curGoal, myObst);
-		int x = curGoal.x;
-		int y = curGoal.y;
+		int x = (int)curGoal.x;
+		int y = (int)curGoal.y;
 		//boolean finalIn = isInObstacle(path.back(), myObst);
 		/*if (curIn)
 			g[x + 400][y + 400] = 1;*/
@@ -222,7 +223,7 @@ void ScoutAgent::Update(vector <obstacle_t> obstacles, OCCGrid * grid){
 			newVel = 0;
 			if (newVel > 50)
 			newVel = 50;*/
-		if (!isfinite(newVel)){
+		if (!_finite(newVel)){
 			newVel = 1;
 			printf("av changed");
 		}
@@ -238,7 +239,7 @@ void ScoutAgent::Update(vector <obstacle_t> obstacles, OCCGrid * grid){
 		s = 0.0;
 	if (s > 1.0)
 		s = 1.0;
-	if (!isfinite(s)){
+	if (!_finite(s)){
 		s = 1.0;
 		printf("s changed");
 	}
@@ -294,7 +295,7 @@ boolean ScoutAgent::isInObstacle(Vector pos, vector<obstacle_t> obstacles){
 	double maxx = -9999.9;
 	double maxy = -9999.9;
 	//obstacles.at(0).numCorners;
-	for (int o = 0; o < obstacles.size(); o++)
+	for (int o = 0; o < (int)obstacles.size(); o++)
 	{
 		obstacle_t obstacle = obstacles.at(o);
 		for (int i = 0; i < obstacle.numCorners; i++)
@@ -351,6 +352,8 @@ Vector * ScoutAgent::findNextGoal(OCCGrid * grid){
 			//	break;
 		}
 	}
+
+	return 0;
 }
 
 Vector * ScoutAgent::setNextGoal(int x, int y){

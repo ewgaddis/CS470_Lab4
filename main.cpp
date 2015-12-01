@@ -3,7 +3,6 @@
 #include <conio.h>
 
 #include "team.h"
-#include "gridWindow.h"
 
 using namespace std;
 
@@ -44,9 +43,6 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	// Initialize grid window
-	initializeGridWindow();
-
 	// Calling agent code
 	world_init(&MyTeam);
 
@@ -57,8 +53,6 @@ int main(int argc, char *argv[])
 		exit = !robot_update();
 		robot_post_update();
 	}
-
-	shutdownGridWindow();
 
 	MyTeam.Close();
 

@@ -364,11 +364,11 @@ bool ASearch::search(int iterations)
 			{	
 				frontier.push(*itNode, costToNextNodeWithH);
 				setParent(*itNode, curNode);
-				cost[*itNode] = costToNextNode;
+				cost[*itNode] = (int)costToNextNode;
 			}
 			else if (exists){
 				if (frontier.update(*itNode, costToNextNodeWithH)){
-					cost[*itNode] = costToNextNode;
+					cost[*itNode] = (int)costToNextNode;
 					setParent(*itNode, curNode);
 				}
 			}

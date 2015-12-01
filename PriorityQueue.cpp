@@ -48,7 +48,7 @@ bool PriorityQueue::update(int node, double newPriority){
 }
 
 int PriorityQueue::find(int node){
-	for (int i = 0; i < pq->size(); i++){
+	for (int i = 0; i < (int)pq->size(); i++){
 		if (node == pq->at(i)){
 			return i;
 		}
