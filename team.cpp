@@ -1,5 +1,6 @@
 #include "team.h"
 
+<<<<<<< HEAD
 #include "gnuplotter.h"
 #include "potentialFields.h"
 #include "graph.h"
@@ -12,14 +13,19 @@
 #include "scoutAgent.h"
 #include "lineAgent.h"
 #include "crazyAgent.h"
+=======
+#include "geometry.h"
+>>>>>>> b200f2f31aca7b1b26823d71829eeb123959cefa
 
-#include <vector>
-#include <conio.h>
+#include <Eigen/Dense>
+#include <iostream>
 
 using namespace std;
+using namespace Eigen;
 
 BZRC *team;
 
+<<<<<<< HEAD
 //OCCGrid *grid;
 LineAgent *line1;
 CrazyAgent *crazy1;
@@ -54,6 +60,11 @@ void world_init(BZRC *my_team)
 
 	grid = new OCCGrid(team, 800, 0.5, truePos, trueNeg);
 	*/
+=======
+void world_init(BZRC *my_team)
+{
+	team = my_team;
+>>>>>>> b200f2f31aca7b1b26823d71829eeb123959cefa
 }
 
 void robot_pre_update()
@@ -62,6 +73,7 @@ void robot_pre_update()
 
 bool robot_update()
 {
+<<<<<<< HEAD
 	//line1->Update();
 	crazy1->Update();
 	/*grid->update(0);
@@ -76,24 +88,28 @@ bool robot_update()
 	updateGridWindow(grid->getGridSize(),
 					 grid->getGrid(),
 					 &obstacles);
+=======
+	Vector v(2.4, -1.9);
+>>>>>>> b200f2f31aca7b1b26823d71829eeb123959cefa
 
-	bool exited = hasExitedGridWindow();
+	Vector2d v2;
+	v.getEVector(&v2);
 
-	if(exited)
-	{
-		delete scout1;
-		delete grid;
+	cout << v2 << endl;
 
-		return false;
-	}
+	v.setEVector(v2);
 
+<<<<<<< HEAD
 	scout1->Update(obstacles, grid);
 	scout2->Update(obstacles, grid);
 	scout3->Update(obstacles, grid);
 	scout4->Update(obstacles, grid);
 	scout5->Update(obstacles, grid);*/
+=======
+	cout << v << endl;
+>>>>>>> b200f2f31aca7b1b26823d71829eeb123959cefa
 
-	return true;
+	return false;
 }
 
 void robot_post_update()

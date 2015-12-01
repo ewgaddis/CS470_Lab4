@@ -4,6 +4,8 @@
 #include <math.h>
 #include <ostream>
 
+#include <Eigen/Dense>
+
 typedef struct sVector
 {
 	double x, y;
@@ -111,6 +113,18 @@ typedef struct sVector
 	double dot(const sVector &v) const
 	{
 		return x * v.x + y * v.y;
+	}
+
+	void setEVector(const Eigen::Vector2d &v)
+	{
+		x = v(0);
+		y = v(1);
+	}
+
+	void getEVector(Eigen::Vector2d *v) const
+	{
+		(*v)(0) = x;
+		(*v)(1) = y;
 	}
 } Vector;
 
