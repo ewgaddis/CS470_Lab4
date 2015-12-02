@@ -64,7 +64,7 @@ void KalmanAgent::Update(){
 	else{
 		myTeam->shoot(botIndex);
 		curTarget++;
-		if (curTarget > otherTanks.size){
+		if (curTarget > otherTanks.size()){
 			otherTanks.clear();
 			myTeam->get_othertanks(&otherTanks);
 			curTarget = 0;
