@@ -13,6 +13,7 @@
 #include "lineAgent.h"
 #include "crazyAgent.h"
 #include "geometry.h"
+#include "kalmanFilter.h"
 
 #include <Eigen/Dense>
 #include <iostream>
@@ -85,24 +86,87 @@ bool robot_update()
 	scout4->Update(obstacles, grid);
 	scout5->Update(obstacles, grid);*/
 
-	GNUPlotter plotter;
-	plotter.createFile("./Data/test.gpi", "Gaussian");
-
-	plotter.drawCircle(Vector(40.0, 60.0), 10,
-					   255, 0, 0);
-	plotter.drawArrow(Vector(40.0, 60.0), Vector(150.0, 75.0), 3);
-
 	VectorXd mean(6);
-	mean(0) = 100.0;
-	mean(3) = 100.0;
+	mean.fill(0.0);
+
+	cout << "mean:\n" << mean << endl;
 
 	MatrixXd sigma(6, 6);
-	sigma(0, 0) = 70.0;
+	sigma.fill(0.0);
+	sigma(0, 0) = 100.0;
+	sigma(1, 1) = 0.1;
+	sigma(2, 2) = 0.1;
 	sigma(3, 3) = 100.0;
-	sigma(0, 3) = sigma(3, 0) = 0.3;
+	sigma(4, 4) = 0.1;
+	sigma(5, 5) = 0.1;
 
-	plotter.drawGaussian(mean, sigma);
+	cout << "sigma:\n" << sigma << endl;
 
+	MatrixXd F(6, 6);
+	F.fill(0.0);
+	F(0, 0) = F(3, 3) = 1.0;
+	F(0, 1) = F(3, 4) = 0.5;
+	F(0, 2) = F(3, 5) = 0.125;
+	F(1, 1) = F(4, 4) = 1.0;
+	F(1, 2) = F(4, 5) = 0.5;
+	F(2, 1) = F(5, 4) = -0.05;
+	F(2, 2) = F(5, 5) = 1.0;
+
+	cout << "F:\n" << F << endl;
+
+	MatrixXd sigmaX(6, 6);
+	sigmaX.fill(0.0);
+	sigmaX(0, 0) = sigmaX(3, 3) = 0.1;
+	sigmaX(1, 1) = sigmaX(4, 4) = 0.1;
+	sigmaX(2, 2) = sigmaX(5, 5) = 100.0;
+
+	cout << "sigmaX:\n" << sigmaX << endl;
+
+	MatrixXd sigmaZ(2, 2);
+	sigmaZ.fill(0);
+	sigmaZ(0, 0) = sigmaZ(1, 1) = 25.0;
+
+	cout << "sigmaZ:\n" << sigmaZ << endl;
+
+	MatrixXd H(2, 6);
+	H.fill(0.0);
+	H(0, 0) = H(1, 3) = 1.0;
+
+	cout << "H:\n" << H << endl;
+
+	KalmanFilter filter(mean, sigma,
+						sigmaX, sigmaZ,
+						F, H);
+
+	Vector pos(40.0, 60.0);
+
+	VectorXd z(2);
+	z.fill(0.0);
+	z(0) = pos.x;
+	z(1) = pos.y;
+
+	GNUPlotter plotter;
+
+	plotter.createFile("./Data/test1.gpi", "Gaussian");
+	plotter.drawCircle(pos, 10, 255, 0, 0);
+	plotter.drawGaussian(filter.getMean(), filter.getSigma());
+	plotter.finishFile();
+
+	cout << "Updating filter..." << endl;
+
+	for(int i = 0; i < 5; ++i)
+	{
+		filter.update(z);
+
+		cout << "mean:\n"  << filter.getMean()  << endl;
+		cout << "sigma:\n" << filter.getSigma() << endl;
+	}
+
+	cout << "Finished updating filter" << endl;
+
+	plotter.createFile("./Data/test2.gpi", "Gaussian");
+	plotter.drawCircle(pos, 10, 255, 0, 0);
+	plotter.drawGaussian(filter.getMean(), filter.getSigma());
 	plotter.finishFile();
 
 	return false;

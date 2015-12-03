@@ -216,16 +216,16 @@ void GNUPlotter::drawGaussian(const VectorXd &mean,
 	fprintf(file, "set palette model RGB functions 1-gray, 1-gray, 1-gray\n");
 	fprintf(file, "set isosamples 100\n");
 
-	fprintf(file, "x = %f\n", mean(0));
-	fprintf(file, "y = %f\n", mean(3));
+	fprintf(file, "mx = %f\n", mean(0));
+	fprintf(file, "my = %f\n", mean(3));
 
 	fprintf(file, "sigma_x = %f\n", sigma(0, 0));
 	fprintf(file, "sigma_y = %f\n", sigma(3, 3));
 	fprintf(file, "rho = %f\n", sigma(3, 0));
 
-	fprintf(file, "splot 1.0 / (2.0 * pi * sigma_x * sigma_y * sqrt(1 - rho ** 2)) \\\n");
-	fprintf(file, "* exp(-1.0 / 2.0 * (x ** 2 / sigma_x ** 2 + y ** 2 / sigma_y ** 2 \\\n");
-	fprintf(file, "- 2.0 * rho * x * y / (sigma_x * sigma_y))) with pm3d\n");
+	fprintf(file, "splot 1.0 / (2.0 * pi * sigma_x * sigma_y * sqrt(1.0 - rho ** 2)) \\\n");
+	fprintf(file, "* exp(-1.0 / (2.0 * (1.0 - rho ** 2)) * ((x - mx) ** 2 / sigma_x ** 2 + (y - my) ** 2 / sigma_y ** 2 \\\n");
+	fprintf(file, "- 2.0 * rho * (x - mx) * (y - my) / (sigma_x * sigma_y))) with pm3d\n");
 }
 
 void GNUPlotter::finishFile()
