@@ -13,9 +13,8 @@ private:
 	Eigen::Matrix2d sigmaZ;
 
 	Eigen::MatrixXd F;
-	Eigen::MatrixXd H;
 
-	Eigen::MatrixXd FT;
+	Eigen::MatrixXd H;
 	Eigen::MatrixXd HT;
 
 public:
@@ -23,13 +22,16 @@ public:
 				 const Eigen::MatrixXd &s,
 				 const Eigen::MatrixXd &sx,
 				 const Eigen::Matrix2d &sz,
-				 const Eigen::MatrixXd &_F,
 				 const Eigen::MatrixXd &_H);
 
-	void update(const Eigen::VectorXd z);
+	void update(const Eigen::VectorXd z,
+				double elapsedTime,
+				double c);
 
 	const Eigen::VectorXd & getMean()  const { return mean;  }
 	const Eigen::MatrixXd & getSigma() const { return sigma; }
+
+	const Eigen::MatrixXd & getF() const { return F; }
 };
 
 #endif

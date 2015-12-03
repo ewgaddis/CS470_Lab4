@@ -102,18 +102,6 @@ bool robot_update()
 
 	cout << "sigma:\n" << sigma << endl;
 
-	MatrixXd F(6, 6);
-	F.fill(0.0);
-	F(0, 0) = F(3, 3) = 1.0;
-	F(0, 1) = F(3, 4) = 0.5;
-	F(0, 2) = F(3, 5) = 0.125;
-	F(1, 1) = F(4, 4) = 1.0;
-	F(1, 2) = F(4, 5) = 0.5;
-	F(2, 1) = F(5, 4) = -0.05;
-	F(2, 2) = F(5, 5) = 1.0;
-
-	cout << "F:\n" << F << endl;
-
 	MatrixXd sigmaX(6, 6);
 	sigmaX.fill(0.0);
 	sigmaX(0, 0) = sigmaX(3, 3) = 0.1;
@@ -136,7 +124,7 @@ bool robot_update()
 
 	KalmanFilter filter(mean, sigma,
 						sigmaX, sigmaZ,
-						F, H);
+						H);
 
 	Vector pos(40.0, 60.0);
 
@@ -156,7 +144,7 @@ bool robot_update()
 
 	for(int i = 0; i < 5; ++i)
 	{
-		filter.update(z);
+		filter.update(z, 0.25, 0.0);
 
 		cout << "mean:\n"  << filter.getMean()  << endl;
 		cout << "sigma:\n" << filter.getSigma() << endl;
