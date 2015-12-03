@@ -78,21 +78,32 @@ bool robot_update()
 					 grid->getGrid(),
 					 &obstacles);
 	*/
-	Vector v(2.4, -1.9);
-
-	Vector2d v2;
-	v.getEVector(&v2);
-
-	cout << v2 << endl;
-
-	v.setEVector(v2);
 
 	/*scout1->Update(obstacles, grid);
 	scout2->Update(obstacles, grid);
 	scout3->Update(obstacles, grid);
 	scout4->Update(obstacles, grid);
 	scout5->Update(obstacles, grid);*/
-	cout << v << endl;
+
+	GNUPlotter plotter;
+	plotter.createFile("./Data/test.gpi", "Gaussian");
+
+	plotter.drawCircle(Vector(40.0, 60.0), 10,
+					   255, 0, 0);
+	plotter.drawArrow(Vector(40.0, 60.0), Vector(150.0, 75.0), 3);
+
+	VectorXd mean(6);
+	mean(0) = 100.0;
+	mean(3) = 100.0;
+
+	MatrixXd sigma(6, 6);
+	sigma(0, 0) = 70.0;
+	sigma(3, 3) = 100.0;
+	sigma(0, 3) = sigma(3, 0) = 0.3;
+
+	plotter.drawGaussian(mean, sigma);
+
+	plotter.finishFile();
 
 	return false;
 }

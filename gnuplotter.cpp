@@ -3,6 +3,7 @@
 #include <iostream>
 #include <deque>
 
+using namespace Eigen;
 using namespace std;
 
 GNUPlotter::GNUPlotter() : file(0)
@@ -22,8 +23,11 @@ void GNUPlotter::createFile(const char *fileName, const char *title)
 	fprintf(file, "set title \"%s\"\n", title);
 	fprintf(file, "set xrange [-400.0: 400.0]\n");
 	fprintf(file, "set yrange [-400.0: 400.0]\n");
+	fprintf(file, "set pm3d\n");
+	fprintf(file, "set view map\n");
 	fprintf(file, "unset key\n");
 	fprintf(file, "set size square\n");
+	fprintf(file, "unset arrow\n");
 }
 
 void GNUPlotter::drawArrow(double x, double y, const Vector &v, int color)
@@ -33,7 +37,7 @@ void GNUPlotter::drawArrow(double x, double y, const Vector &v, int color)
 		return;
 	}
 
-	fprintf(file, "set arrow from %f, %f to %f, %f size 25, 20 lt %i\n",
+	fprintf(file, "set arrow from %f, %f to %f, %f size 25, 20 front lt %i\n",
 			x - v.x / 2.0, y - v.y / 2.0,
 			x + v.x / 2.0, y + v.y / 2.0,
 			color);
@@ -46,7 +50,7 @@ void GNUPlotter::drawArrow(const Vector &t, const Vector &h, int color)
 		return;
 	}
 
-	fprintf(file, "set arrow from %f, %f to %f, %f size 25, 20 lt %i\n",
+	fprintf(file, "set arrow from %f, %f to %f, %f size 25, 20 front lt %i\n",
 			t.x, t.y, h.x, h.y, color);
 }
 
@@ -57,7 +61,7 @@ void GNUPlotter::drawLine(double x1, double y1, double x2, double y2, int color)
 		return;
 	}
 
-	fprintf(file, "set arrow from %f, %f to %f, %f nohead lt %i\n",
+	fprintf(file, "set arrow from %f, %f to %f, %f nohead front lt %i\n",
 			x1, y1, x2, y2, color);
 }
 
@@ -69,7 +73,7 @@ void GNUPlotter::drawCircle(const Vector &c, int radius,
 		return;
 	}
 
-	fprintf(file, "set object circle at %f,%f size %i fillcolor rgb \"#%02X%02X%02X\" fillstyle solid\n",
+	fprintf(file, "set object circle at %f,%f size %i front fillcolor rgb \"#%02X%02X%02X\" fillstyle solid\n",
 			c.x, c.y, radius, r, g, b);
 }
 
@@ -201,13 +205,33 @@ void GNUPlotter::drawGraphSearch(const Graph &graph,
 	}
 }
 
+void GNUPlotter::drawGaussian(const VectorXd &mean,
+							  const MatrixXd &sigma)
+{
+	if(!file)
+	{
+		return;
+	}
+
+	fprintf(file, "set palette model RGB functions 1-gray, 1-gray, 1-gray\n");
+	fprintf(file, "set isosamples 100\n");
+
+	fprintf(file, "x = %f\n", mean(0));
+	fprintf(file, "y = %f\n", mean(3));
+
+	fprintf(file, "sigma_x = %f\n", sigma(0, 0));
+	fprintf(file, "sigma_y = %f\n", sigma(3, 3));
+	fprintf(file, "rho = %f\n", sigma(3, 0));
+
+	fprintf(file, "splot 1.0 / (2.0 * pi * sigma_x * sigma_y * sqrt(1 - rho ** 2)) \\\n");
+	fprintf(file, "* exp(-1.0 / 2.0 * (x ** 2 / sigma_x ** 2 + y ** 2 / sigma_y ** 2 \\\n");
+	fprintf(file, "- 2.0 * rho * x * y / (sigma_x * sigma_y))) with pm3d\n");
+}
+
 void GNUPlotter::finishFile()
 {
 	if(file)
 	{
-		fprintf(file, "plot '-' with lines\n");
-		fprintf(file, "0 0 0 0\ne\n");
-
 		fclose(file);
 		file = 0;
 	}
