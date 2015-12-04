@@ -13,7 +13,11 @@
 #include "lineAgent.h"
 #include "crazyAgent.h"
 #include "geometry.h"
+<<<<<<< HEAD
+#include "kalmanAgent.h"
+=======
 #include "kalmanFilter.h"
+>>>>>>> a998afc4c0b397c3bdf650df7f8d41ada5ed212e
 
 #include <Eigen/Dense>
 #include <iostream>
@@ -25,6 +29,7 @@ BZRC *team;
 //OCCGrid *grid;
 LineAgent *line1;
 CrazyAgent *crazy1;
+KalmanAgent *kalman1;
 
 //double trueNeg;
 //double truePos;
@@ -33,22 +38,23 @@ void world_init(BZRC *my_team)
 {
 	team = my_team;
 	//line1 = new LineAgent(team, 0);
-	crazy1 = new CrazyAgent(team, 0);
+	//crazy1 = new CrazyAgent(team, 0);
+	kalman1 = new KalmanAgent(team, 0);
 	/*vector<constant_t> constants;
 	team->get_constants(&constants);
 	for each(constant_t c in constants){
-	if (c.name.compare("truenegative") == 0){
-	trueNeg = atof(c.value.c_str());
-	//printf("name: %s value: %s \n", c.name.c_str(), c.value.c_str());
+		/*if (c.name.compare("truenegative") == 0){
+		trueNeg = atof(c.value.c_str());
+		//printf("name: %s value: %s \n", c.name.c_str(), c.value.c_str());
+		}
+		else if (c.name.compare("truepositive") == 0){
+		truePos = atof(c.value.c_str());
+		//printf("name: %s value: %s \n", c.name.c_str(), c.value.c_str());
+		}
+		printf("\n1name: %s value: %s \n", c.name.c_str(), c.value.c_str());
+		printf(c.name.c_str());
 	}
-	else if (c.name.compare("truepositive") == 0){
-	truePos = atof(c.value.c_str());
-	//printf("name: %s value: %s \n", c.name.c_str(), c.value.c_str());
-	}
-	//printf("1name: %s value: %s \n", c.name.c_str(), c.value.c_str());
-	//printf(c.name.c_str());
-	}
-	scout1 = new ScoutAgent(team, 0, "upper");
+	/*scout1 = new ScoutAgent(team, 0, "upper");
 	scout2 = new ScoutAgent(team, 1, "lower");
 	scout3 = new ScoutAgent(team, 2, "lower");
 	scout4 = new ScoutAgent(team, 3, "lower");
@@ -65,7 +71,8 @@ void robot_pre_update()
 bool robot_update()
 {
 	//line1->Update();
-	crazy1->Update();
+	//crazy1->Update();
+	kalman1->Update();
 	/*grid->update(0);
 	grid->update(1);
 	grid->update(2);
@@ -79,12 +86,26 @@ bool robot_update()
 					 grid->getGrid(),
 					 &obstacles);
 	*/
+<<<<<<< HEAD
+	Vector v(2.4, -1.9);
+
+	Vector2d v2;
+	v.getEVector(&v2);
+
+	//cout << v2 << endl;
+
+	v.setEVector(v2);
+=======
+>>>>>>> a998afc4c0b397c3bdf650df7f8d41ada5ed212e
 
 	/*scout1->Update(obstacles, grid);
 	scout2->Update(obstacles, grid);
 	scout3->Update(obstacles, grid);
 	scout4->Update(obstacles, grid);
 	scout5->Update(obstacles, grid);*/
+<<<<<<< HEAD
+	//cout << v << endl;
+=======
 
 	KalmanFilter filter(100.0, 0.1, 0.1,
 						0.1, 0.1, 100.0,
@@ -120,8 +141,10 @@ bool robot_update()
 	plotter.drawCircle(pos, 10, 255, 0, 0);
 	plotter.drawGaussian(filter.getMean(), filter.getSigma());
 	plotter.finishFile();
+>>>>>>> a998afc4c0b397c3bdf650df7f8d41ada5ed212e
 
-	return false;
+	//return false;
+	return true;
 }
 
 void robot_post_update()

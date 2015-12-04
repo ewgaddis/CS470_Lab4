@@ -12,6 +12,13 @@ class KalmanAgent {
 	double oldAngle;
 	vector <otank_t> otherTanks;
 	int curTarget;
+	double shotRadius;
+	double shotRange;
+	double shotSpeed;
+	double tankSpeed;//maybe not needed?
+	int shotTimer;
+	int timerMax;
+	Vector curGoal;
 public: KalmanAgent(BZRC* team, int index);
 
 		void Update();

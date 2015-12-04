@@ -15,7 +15,7 @@ void LineAgent::Update(){
 	myTeam->get_mytanks(&myTanks);
 	myTeam->shoot(botIndex);
 	
-	if (time>1000 && (myTanks[botIndex].pos[0] > 390 || myTanks[botIndex].pos[0] < -390 || myTanks[botIndex].pos[1]>390 || myTanks[botIndex].pos[1]< -390))
+	if (time>2000 && (myTanks[botIndex].pos[0] > 390 || myTanks[botIndex].pos[0] < -390 || myTanks[botIndex].pos[1]>390 || myTanks[botIndex].pos[1]< -390))
 	{
 		if (forward)
 			forward = false;
