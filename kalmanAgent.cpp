@@ -1,7 +1,12 @@
 #include "kalmanAgent.h"
+#include "kalmanFilter.h"
 #include "geometry.h"
-#include <math.h>
+#include "gnuplotter.h"
 
+#include <math.h>
+#include <Eigen/Dense>
+
+using namespace Eigen;
 KalmanAgent::KalmanAgent(BZRC* team, int index){
 	myTeam = team;
 	botIndex = index;
@@ -34,11 +39,54 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 		//printf("1name: %s value: %s \n", c.name.c_str(), c.value.c_str());
 		//printf(c.name.c_str());
 	}
+	KalmanFilter filter(100.0, 0.1, 0.1,
+		0.1, 0.1, 100.0,
+		25.0);
+	//KalmanFilter filter(mean, sigma,
+	//	sigmaX, sigmaZ,
+	//	H);
 
-	double newX = otherTanks[curTarget].pos[0] + cos(otherTanks[curTarget].angle) * tankSpeed * shotTimer;
-	double newY = otherTanks[curTarget].pos[1] + sin(otherTanks[curTarget].angle) * tankSpeed * shotTimer;
-	printf("\n%d", otherTanks[curTarget].angle);
-	curGoal = Vector(newX, newY);
+	vector <tank_t> myTanks;
+	myTeam->get_mytanks(&myTanks);
+	//filter made->now hone in.
+	Vector pos(otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
+	Vector myPos(myTanks[botIndex].pos[0], myTanks[botIndex].pos[1]);
+
+	VectorXd z(2);
+	z.fill(0.0);
+	z(0) = pos.x;
+	z(1) = pos.y;
+
+	GNUPlotter plotter;
+
+	//plotter.createFile("./Data/test1.gpi", "Gaussian");
+	//plotter.drawCircle(pos, 10, 255, 0, 0);
+	//plotter.drawGaussian(filter.getMean(), filter.getSigma());
+	//plotter.finishFile();
+
+	//cout << "Updating filter..." << endl;
+
+	for (int i = 0; i < 5; ++i)
+	{
+		filter.update(z, 0.25, 0.0);
+
+		//cout << "mean:\n" << filter.getMean() << endl;
+		//cout << "sigma:\n" << filter.getSigma() << endl;
+	}
+
+	//cout << "Finished updating filter" << endl;
+
+	//plotter.createFile("./Data/test2.gpi", "Gaussian");
+	//plotter.drawCircle(pos, 10, 255, 0, 0);
+	//plotter.drawGaussian(filter.getMean(), filter.getSigma());
+	//plotter.finishFile();
+
+	//time to make a prediction:
+	VectorXd newGoal = VectorXd();
+	double time = vectorDistance(myPos, pos) / (shotSpeed + (Vector(filter.getMean()(1),filter.getMean()(4)).length()));
+	filter.predict(time,0,&newGoal);
+	curGoal = Vector(newGoal(0), newGoal(3));
+	printf("\n %f %f", curGoal.x, curGoal.y);
 }
 
 void KalmanAgent::Update(){
@@ -47,13 +95,7 @@ void KalmanAgent::Update(){
 	myTeam->get_mytanks(&myTanks);
 	Vector aForce;
 	//myTeam->shoot(botIndex);
-	//otherTanks[curTarget];
-	//so, I can get the enemies angle, but not how fast they are going. . .
 	//takes about 10 secons sometimes for a turn
-	//deltaX/(||vp||+||v||) = time (Difference of positions?)/(magnitude of vector of direction he's going in?)+posmagnitude of 
-	//future pos = XofTarget + vt + (1 / 2)at ^ 2 (position of target + velocity(time)+1/2(accel*time^2)
-	//so the shot should have moved by 350*100 = 3500 = 3.5 secs?+11000
-
 
 	//Vector goal = Vector(newX, newY);//otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
 	Vector myPos = Vector(myTanks[botIndex].pos[0], myTanks[botIndex].pos[1]);
@@ -62,7 +104,7 @@ void KalmanAgent::Update(){
 	//end frobbing - f = a/dist + b
 	//last param = range that obstacles affect bot.
 
-	newDirection += aForce;
+	//newDirection += aForce;
 	/*if (newDirection.x > 20.0)
 		newDirection.x = 20.0;
 	if (newDirection.y > 20.0)
@@ -99,21 +141,62 @@ void KalmanAgent::Update(){
 	else{
 		//Sleep(shotTimer);
 		myTeam->angvel(botIndex, 0);
-		while (shotTimer >= 0)
-			shotTimer--;
-		shotTimer = timerMax;
+		//while (shotTimer >= 0)
+		//	shotTimer--;
+		//shotTimer = timerMax;
 		myTeam->shoot(botIndex);
 		curTarget++;
 		if (curTarget >= otherTanks.size()){
 			otherTanks.clear();
 			myTeam->get_othertanks(&otherTanks);
 			curTarget = 0;
-			//work on out of range targets later.
 		}
-		double newX = otherTanks[curTarget].pos[0] + cos(otherTanks[curTarget].angle) * tankSpeed * shotTimer;
-		double newY = otherTanks[curTarget].pos[1] + sin(otherTanks[curTarget].angle) * tankSpeed * shotTimer;
-		printf("\n%d", otherTanks[curTarget].angle);
-		curGoal = Vector(newX, newY);
+		KalmanFilter filter(100.0, 0.1, 0.1,
+			0.1, 0.1, 100.0,
+			25.0);
+		/*KalmanFilter filter(mean, sigma,
+			sigmaX, sigmaZ,
+			H);*/
+		//filter made->now hone in.
+		Vector pos(otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
+
+		VectorXd z(2);
+		z.fill(0.0);
+		z(0) = pos.x;
+		z(1) = pos.y;
+
+		//GNUPlotter plotter;
+
+		//plotter.createFile("./Data/test1.gpi", "Gaussian");
+		//plotter.drawCircle(pos, 10, 255, 0, 0);
+		//plotter.drawGaussian(filter.getMean(), filter.getSigma());
+		//plotter.finishFile();
+
+		//cout << "Updating filter..." << endl;
+
+		for (int i = 0; i < 10; ++i)
+		{
+			filter.update(z, 0.25, 0.0);
+
+			//cout << "mean:\n" << filter.getMean() << endl;
+			//cout << "sigma:\n" << filter.getSigma() << endl;
+		}
+
+		//cout << "Finished updating filter" << endl;
+
+		//plotter.createFile("./Data/test2.gpi", "Gaussian");
+		//plotter.drawCircle(pos, 10, 255, 0, 0);
+		//plotter.drawGaussian(filter.getMean(), filter.getSigma());
+		//plotter.finishFile();
+
+		//time to make a prediction:
+		//curGoal = Vector(newX, newY);
+		VectorXd newGoal = VectorXd();
+		double time = vectorDistance(myPos, pos) / (shotSpeed + Vector(filter.getMean()(1), filter.getMean()(4)).length());
+		filter.predict(time, 0, &newGoal);
+		curGoal = Vector(newGoal(0), newGoal(3));
+		printf("\nNew: %f %f", curGoal.x, curGoal.y);
+		cout << "\nMean:\n" << filter.getMean() << endl;
 	}
-	shotTimer--;
+	//shotTimer--;
 }

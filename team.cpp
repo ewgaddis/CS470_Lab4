@@ -99,7 +99,7 @@ bool robot_update()
 	scout5->Update(obstacles, grid);*/
 	//cout << v << endl;
 
-	KalmanFilter filter(100.0, 0.1, 0.1,
+	/*KalmanFilter filter(100.0, 0.1, 0.1,
 						0.1, 0.1, 100.0,
 						25.0);
 
@@ -132,7 +132,7 @@ bool robot_update()
 	plotter.createFile("./Data/test2.gpi", "Gaussian");
 	plotter.drawCircle(pos, 10, 255, 0, 0);
 	plotter.drawGaussian(filter.getMean(), filter.getSigma());
-	plotter.finishFile();
+	plotter.finishFile();*/
 
 	//return false;
 	return true;
