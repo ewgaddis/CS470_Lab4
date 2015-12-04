@@ -8,7 +8,7 @@
 using namespace std;
 
 const char *kDefaultServerName = "localhost";
-const int kDefaultServerPort = 52573;
+const int kDefaultServerPort = 51098;
 
 int main(int argc, char *argv[])
 {
