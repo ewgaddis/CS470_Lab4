@@ -6,6 +6,7 @@
 #include "graph.h"
 #include "graphAlgorithms.h"
 
+#include <Eigen/Dense>
 #include <vector>
 
 class GNUPlotter
@@ -32,6 +33,9 @@ public:
 
 	void drawGraphSearch(const Graph &graph,
 						 const GraphSearch *graphSearch);
+
+	void drawGaussian(const Eigen::VectorXd &mean,
+					  const Eigen::MatrixXd &sigma);
 };
 
 #endif
