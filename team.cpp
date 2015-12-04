@@ -86,45 +86,9 @@ bool robot_update()
 	scout4->Update(obstacles, grid);
 	scout5->Update(obstacles, grid);*/
 
-	VectorXd mean(6);
-	mean.fill(0.0);
-
-	cout << "mean:\n" << mean << endl;
-
-	MatrixXd sigma(6, 6);
-	sigma.fill(0.0);
-	sigma(0, 0) = 100.0;
-	sigma(1, 1) = 0.1;
-	sigma(2, 2) = 0.1;
-	sigma(3, 3) = 100.0;
-	sigma(4, 4) = 0.1;
-	sigma(5, 5) = 0.1;
-
-	cout << "sigma:\n" << sigma << endl;
-
-	MatrixXd sigmaX(6, 6);
-	sigmaX.fill(0.0);
-	sigmaX(0, 0) = sigmaX(3, 3) = 0.1;
-	sigmaX(1, 1) = sigmaX(4, 4) = 0.1;
-	sigmaX(2, 2) = sigmaX(5, 5) = 100.0;
-
-	cout << "sigmaX:\n" << sigmaX << endl;
-
-	MatrixXd sigmaZ(2, 2);
-	sigmaZ.fill(0);
-	sigmaZ(0, 0) = sigmaZ(1, 1) = 25.0;
-
-	cout << "sigmaZ:\n" << sigmaZ << endl;
-
-	MatrixXd H(2, 6);
-	H.fill(0.0);
-	H(0, 0) = H(1, 3) = 1.0;
-
-	cout << "H:\n" << H << endl;
-
-	KalmanFilter filter(mean, sigma,
-						sigmaX, sigmaZ,
-						H);
+	KalmanFilter filter(100.0, 0.1, 0.1,
+						0.1, 0.1, 100.0,
+						25.0);
 
 	Vector pos(40.0, 60.0);
 
