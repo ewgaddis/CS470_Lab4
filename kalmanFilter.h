@@ -18,20 +18,25 @@ private:
 	Eigen::MatrixXd HT;
 
 public:
-	KalmanFilter(const Eigen::VectorXd &m,
-				 const Eigen::MatrixXd &s,
-				 const Eigen::MatrixXd &sx,
-				 const Eigen::Matrix2d &sz,
-				 const Eigen::MatrixXd &_H);
+	KalmanFilter(double initialSigmaPos,
+				 double initialSigmaVel,
+				 double initialSigmaAccel,
+				 double sigmaPos,
+				 double sigmaVel,
+				 double sigmaAccel,
+				 double sigmaObs);
 
-	void update(const Eigen::VectorXd z,
+	void update(const Eigen::VectorXd &z,
 				double elapsedTime,
 				double c);
+
+	void predict(double time, double c, Eigen::VectorXd *m);
 
 	const Eigen::VectorXd & getMean()  const { return mean;  }
 	const Eigen::MatrixXd & getSigma() const { return sigma; }
 
 	const Eigen::MatrixXd & getF() const { return F; }
+	const Eigen::MatrixXd & getH() const { return H; }
 };
 
 #endif
