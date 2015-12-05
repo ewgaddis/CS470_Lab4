@@ -28,9 +28,12 @@ public:
 
 	void update(const Eigen::VectorXd &z,
 				double elapsedTime,
-				double c);
+				double c,
+				bool ignoreVel = false,
+				bool ignoreAccel = false);
 
-	void predict(double time, double c, Eigen::VectorXd *m);
+	void predict(double time, double c, Eigen::VectorXd *m,
+				 bool ignoreVel = false, bool ignoreAccel = false);
 
 	const Eigen::VectorXd & getMean()  const { return mean;  }
 	const Eigen::MatrixXd & getSigma() const { return sigma; }

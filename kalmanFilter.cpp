@@ -43,11 +43,13 @@ KalmanFilter::KalmanFilter(double initialSigmaPos,
 
 void KalmanFilter::update(const VectorXd &z,
 						  double elapsedTime,
-						  double c)
+						  double c,
+						  bool ignoreVel,
+						  bool ignoreAccel)
 {
-	F(0, 1) = F(3, 4) = elapsedTime;
-	F(0, 2) = F(3, 5) = elapsedTime * elapsedTime / 2.0;
-	F(1, 2) = F(4, 5) = elapsedTime;
+	F(0, 1) = F(3, 4) = (ignoreVel ? 0.0 : elapsedTime);
+	F(0, 2) = F(3, 5) = (ignoreAccel ? 0.0 : elapsedTime * elapsedTime / 2.0);
+	F(1, 2) = F(4, 5) = (ignoreAccel ? 0.0 : elapsedTime);
 	F(2, 1) = F(5, 4) = -c;
 
 	MatrixXd FT(F.transpose());
@@ -63,11 +65,12 @@ void KalmanFilter::update(const VectorXd &z,
 	sigma = (MatrixXd::Identity(6, 6) - K * H) * (A + sigmaX);
 }
 
-void KalmanFilter::predict(double time, double c, Eigen::VectorXd *m)
+void KalmanFilter::predict(double time, double c, Eigen::VectorXd *m,
+						   bool ignoreVel, bool ignoreAccel)
 {
-	F(0, 1) = F(3, 4) = time;
-	F(0, 2) = F(3, 5) = time * time / 2.0;
-	F(1, 2) = F(4, 5) = time;
+	F(0, 1) = F(3, 4) = (ignoreVel ? 0.0 : time);
+	F(0, 2) = F(3, 5) = (ignoreAccel ? 0.0 : time * time / 2.0);
+	F(1, 2) = F(4, 5) = (ignoreAccel ? 0.0 : time);
 	F(2, 1) = F(5, 4) = -c;
 
 	(*m) = F * mean;
