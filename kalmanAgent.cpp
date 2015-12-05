@@ -15,7 +15,7 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 	oldAngle = 0.0;
 	myTeam->get_othertanks(&otherTanks);
 	curTarget = 0;
-	timerMax = 4500;
+	timerMax = 6500;
 	shotTimer = timerMax;
 	vector<constant_t> constants;
 	team->get_constants(&constants);
@@ -39,8 +39,8 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 		//printf("1name: %s value: %s \n", c.name.c_str(), c.value.c_str());
 		//printf(c.name.c_str());
 	}
-	KalmanFilter filter(100.0, 0.1, 0.1,
-		0.1, 0.1, 100.0,
+	KalmanFilter filter(400.0, 0.1, 0.1,
+		0.1, 0.1, 25.0,
 		25.0);
 	//KalmanFilter filter(mean, sigma,
 	//	sigmaX, sigmaZ,
@@ -52,10 +52,10 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 	Vector pos(otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
 	Vector myPos(myTanks[botIndex].pos[0], myTanks[botIndex].pos[1]);
 
-	VectorXd z(2);
+	/*VectorXd z(2);
 	z.fill(0.0);
 	z(0) = pos.x;
-	z(1) = pos.y;
+	z(1) = pos.y;*/
 
 	GNUPlotter plotter;
 
@@ -68,6 +68,15 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 
 	for (int i = 0; i < 5; ++i)
 	{
+		myPos.x = myTanks[botIndex].pos[0];
+		myPos.y = myTanks[botIndex].pos[1];
+
+		VectorXd z(2);
+		z.fill(0.0);
+		z(0) = pos.x;
+		z(1) = pos.y;
+
+
 		filter.update(z, 0.25, 0.0);
 
 		//cout << "mean:\n" << filter.getMean() << endl;
@@ -84,7 +93,7 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 	//time to make a prediction:
 	VectorXd newGoal = VectorXd();
 	double time = vectorDistance(myPos, pos) / (shotSpeed + (Vector(filter.getMean()(1),filter.getMean()(4)).length()));
-	filter.predict(time,0,&newGoal);
+	filter.predict(time+6.5,0,&newGoal);
 	curGoal = Vector(newGoal(0), newGoal(3));
 	printf("\n %f %f", curGoal.x, curGoal.y);
 }
@@ -130,7 +139,7 @@ void KalmanAgent::Update(){
 
 	if (angle > 0.0001 || angle < -0.0001)//(angle > 0.0000001 || angle < -0.0000001)
 	{
-		double newVel = (angle / (M_1_PI / 2.0)) + (100.0*avgAngVel); //(100.0*avgAngVel);
+		double newVel = (angle / (M_1_PI / 1.0)) + (100.0*avgAngVel); //(100.0*avgAngVel);
 		if (side < 0){
 			myTeam->angvel(botIndex, newVel);
 		}
@@ -146,24 +155,33 @@ void KalmanAgent::Update(){
 		//shotTimer = timerMax;
 		myTeam->shoot(botIndex);
 		curTarget++;
-		if (curTarget >= otherTanks.size()){
-			otherTanks.clear();
-			myTeam->get_othertanks(&otherTanks);
-			curTarget = 0;
+		bool validTarget = false;
+		while (!validTarget){
+			if (curTarget >= otherTanks.size()){
+				otherTanks.clear();
+				myTeam->get_othertanks(&otherTanks);
+				curTarget = 0;
+			}
+			Vector pos(otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
+			if (otherTanks[curTarget].color.compare("blue") != 0 || pos.x > 400 || pos.y > 400 || pos.x < -400 || pos.y < -400)
+				curTarget++;
+			else
+				validTarget = true;
 		}
-		KalmanFilter filter(100.0, 0.1, 0.1,
-			0.1, 0.1, 100.0,
+		KalmanFilter filter(400.0, 0.1, 0.1,
+			0.1, 0.1, 25.0,
 			25.0);
 		/*KalmanFilter filter(mean, sigma,
 			sigmaX, sigmaZ,
 			H);*/
 		//filter made->now hone in.
 		Vector pos(otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
+		printf("\nPos: %f %f tank: %s", pos.x, pos.y, otherTanks[curTarget].color.c_str());
 
-		VectorXd z(2);
+		/*VectorXd z(2);
 		z.fill(0.0);
 		z(0) = pos.x;
-		z(1) = pos.y;
+		z(1) = pos.y;*/
 
 		//GNUPlotter plotter;
 
@@ -176,6 +194,14 @@ void KalmanAgent::Update(){
 
 		for (int i = 0; i < 10; ++i)
 		{
+			pos.x = otherTanks[curTarget].pos[0];
+			pos.y = otherTanks[curTarget].pos[1];
+
+			VectorXd z(2);
+			z.fill(0.0);
+			z(0) = pos.x;
+			z(1) = pos.y;
+
 			filter.update(z, 0.25, 0.0);
 
 			//cout << "mean:\n" << filter.getMean() << endl;
@@ -193,10 +219,12 @@ void KalmanAgent::Update(){
 		//curGoal = Vector(newX, newY);
 		VectorXd newGoal = VectorXd();
 		double time = vectorDistance(myPos, pos) / (shotSpeed + Vector(filter.getMean()(1), filter.getMean()(4)).length());
-		filter.predict(time, 0, &newGoal);
+		filter.predict(time+6.5, 0, &newGoal);
 		curGoal = Vector(newGoal(0), newGoal(3));
 		printf("\nNew: %f %f", curGoal.x, curGoal.y);
 		cout << "\nMean:\n" << filter.getMean() << endl;
+		myTeam->shoot(botIndex);
+		
 	}
 	//shotTimer--;
 }
