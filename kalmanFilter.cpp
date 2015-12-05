@@ -1,5 +1,7 @@
 #include "kalmanFilter.h"
 
+#include "gnuplotter.h"
+
 using namespace Eigen;
 
 KalmanFilter::KalmanFilter(double initialSigmaPos,
@@ -74,4 +76,51 @@ void KalmanFilter::predict(double time, double c, Eigen::VectorXd *m,
 	F(2, 1) = F(5, 4) = -c;
 
 	(*m) = F * mean;
+}
+
+void plotKalmanFilter(KalmanFilter &filter, double predictTime, double predictC,
+					  const Vector *actualPos, const Vector *actualVel)
+{
+	static int number = 0;
+
+	char fileName[256];
+	sprintf(fileName, "./Data/kalman%i.gpi", number);
+
+	char title[256];
+	sprintf(title, "Kalman Filter #%i", number);
+
+	++number;
+
+	GNUPlotter plotter;
+
+	plotter.createFile(fileName, title);
+
+	Vector meanPos(filter.getMean()(0), filter.getMean()(3));
+	Vector meanVel(filter.getMean()(1), filter.getMean()(4));
+
+	plotter.drawCircle(meanPos, 5, 255, 0, 255);
+	plotter.drawArrow(meanPos, meanPos + meanVel, 4);
+
+	if(actualPos)
+	{
+		plotter.drawCircle(*actualPos, 5, 255, 0, 0);
+
+		if(actualVel)
+		{
+			plotter.drawArrow(*actualPos, *actualPos + *actualVel, 3);
+		}
+	}
+
+	if(predictTime > 0.0)
+	{
+		VectorXd p;
+		filter.predict(predictTime, predictC, &p);
+
+		plotter.drawCircle(Vector(p(0), p(3)), 5, 0, 0, 255);
+		plotter.drawArrow(Vector(p(0), p(3)), Vector(p(0) + p(1), p(3) + p(4)), 2);
+	}
+
+	plotter.drawGaussian(filter.getMean(), filter.getSigma());
+
+	plotter.finishFile();
 }

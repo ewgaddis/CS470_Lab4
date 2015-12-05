@@ -1,6 +1,8 @@
 #ifndef KALMAN_FILTER_H
 #define KALMAN_FILTER_H
 
+#include "geometry.h"
+
 #include <Eigen/Dense>
 
 class KalmanFilter
@@ -41,5 +43,8 @@ public:
 	const Eigen::MatrixXd & getF() const { return F; }
 	const Eigen::MatrixXd & getH() const { return H; }
 };
+
+void plotKalmanFilter(KalmanFilter &filter, double predictTime, double predictC,
+					  const Vector *actualPos, const Vector *actualVel);
 
 #endif
