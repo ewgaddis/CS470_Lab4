@@ -98,8 +98,8 @@ void plotKalmanFilter(KalmanFilter &filter, double predictTime, double predictC,
 	Vector meanPos(filter.getMean()(0), filter.getMean()(3));
 	Vector meanVel(filter.getMean()(1), filter.getMean()(4));
 
-	plotter.drawCircle(meanPos, 5, 255, 0, 255);
-	plotter.drawArrow(meanPos, meanPos + meanVel, 4);
+	plotter.drawCircle(meanPos, 5, 0, 0, 255);
+	plotter.drawArrow(meanPos, meanPos + meanVel, 0, 0, 255);
 
 	if(actualPos)
 	{
@@ -107,7 +107,7 @@ void plotKalmanFilter(KalmanFilter &filter, double predictTime, double predictC,
 
 		if(actualVel)
 		{
-			plotter.drawArrow(*actualPos, *actualPos + *actualVel, 3);
+			plotter.drawArrow(*actualPos, *actualPos + *actualVel, 255, 0, 0);
 		}
 	}
 
@@ -116,8 +116,8 @@ void plotKalmanFilter(KalmanFilter &filter, double predictTime, double predictC,
 		VectorXd p;
 		filter.predict(predictTime, predictC, &p);
 
-		plotter.drawCircle(Vector(p(0), p(3)), 5, 0, 0, 255);
-		plotter.drawArrow(Vector(p(0), p(3)), Vector(p(0) + p(1), p(3) + p(4)), 2);
+		plotter.drawCircle(Vector(p(0), p(3)), 5, 0, 255, 0);
+		plotter.drawArrow(Vector(p(0), p(3)), Vector(p(0) + p(1), p(3) + p(4)), 0, 255, 0);
 	}
 
 	plotter.drawGaussian(filter.getMean(), filter.getSigma());

@@ -54,6 +54,18 @@ void GNUPlotter::drawArrow(const Vector &t, const Vector &h, int color)
 			t.x, t.y, h.x, h.y, color);
 }
 
+void GNUPlotter::drawArrow(const Vector &t, const Vector &h,
+						   unsigned char r, unsigned char g, unsigned char b)
+{
+	if(!file)
+	{
+		return;
+	}
+
+	fprintf(file, "set arrow from %f, %f to %f, %f size 25, 20 front lt rgb \"#%02X%02X%02X\"\n",
+			t.x, t.y, h.x, h.y, r, g, b);
+}
+
 void GNUPlotter::drawLine(double x1, double y1, double x2, double y2, int color)
 {
 	if(!file)
