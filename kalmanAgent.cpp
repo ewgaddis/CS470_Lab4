@@ -1,7 +1,7 @@
 #include "kalmanAgent.h"
-#include "kalmanFilter.h"
 #include "geometry.h"
 #include "gnuplotter.h"
+//#include "kalmanFilter.h"
 
 #include <math.h>
 #include <Eigen/Dense>
@@ -19,6 +19,7 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 	shotTimer = timerMax;
 	vector<constant_t> constants;
 	team->get_constants(&constants);
+	//filter = new KalmanFilter(800.0, 0.01, 0.01, 0.1, 0.01, 0.01, 25.0);
 	for each(constant_t c in constants){
 		if (c.name.compare("shotradius") == 0){
 			shotRadius = atof(c.value.c_str());
@@ -42,9 +43,6 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 	KalmanFilter filter(800.0, 0.01, 0.01,
 		0.1, 0.01, 0.01,
 		25.0);
-	//KalmanFilter filter(mean, sigma,
-	//	sigmaX, sigmaZ,
-	//	H);
 
 	vector <tank_t> myTanks;
 	myTeam->get_mytanks(&myTanks);
@@ -56,15 +54,6 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 	z.fill(0.0);
 	z(0) = pos.x;
 	z(1) = pos.y;*/
-
-	GNUPlotter plotter;
-
-	//plotter.createFile("./Data/test1.gpi", "Gaussian");
-	//plotter.drawCircle(pos, 10, 255, 0, 0);
-	//plotter.drawGaussian(filter.getMean(), filter.getSigma());
-	//plotter.finishFile();
-
-	//cout << "Updating filter..." << endl;
 
 	for (int i = 0; i < 20; ++i)
 	{
@@ -82,13 +71,6 @@ KalmanAgent::KalmanAgent(BZRC* team, int index){
 		//cout << "mean:\n" << filter.getMean() << endl;
 		//cout << "sigma:\n" << filter.getSigma() << endl;
 	}
-
-	//cout << "Finished updating filter" << endl;
-
-	//plotter.createFile("./Data/test2.gpi", "Gaussian");
-	//plotter.drawCircle(pos, 10, 255, 0, 0);
-	//plotter.drawGaussian(filter.getMean(), filter.getSigma());
-	//plotter.finishFile();
 
 	//time to make a prediction:
 	VectorXd newGoal = VectorXd();
@@ -168,12 +150,12 @@ void KalmanAgent::Update(){
 			else
 				validTarget = true;
 		}
-		KalmanFilter filter(800.0, 0.01, 0.01,
+		/*KalmanFilter filter(800.0, 0.01, 0.01,
 			0.1, 0.01, 0.01,
+			25.0);*/
+		KalmanFilter filter(1600.0, 400.0, 100.0,
+			0.1, 0.01, 25.0,
 			25.0);
-		/*KalmanFilter filter(mean, sigma,
-			sigmaX, sigmaZ,
-			H);*/
 		//filter made->now hone in.
 		Vector pos(otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
 		printf("\nPos: %f %f tank: %s", pos.x, pos.y, otherTanks[curTarget].color.c_str());
@@ -183,7 +165,7 @@ void KalmanAgent::Update(){
 		z(0) = pos.x;
 		z(1) = pos.y;*/
 
-		for (int i = 0; i < 20; ++i)
+		for (int i = 0; i < 30; ++i)
 		{
 			pos.x = otherTanks[curTarget].pos[0];
 			pos.y = otherTanks[curTarget].pos[1];
@@ -217,14 +199,14 @@ void KalmanAgent::Update(){
 		//time to make a prediction:
 		//curGoal = Vector(newX, newY);
 		VectorXd newGoal = VectorXd();
-		double time = 10*(vectorDistance(myPos, pos) / (shotSpeed + Vector(filter.getMean()(1), filter.getMean()(4)).length()));
+		double time = 0.3*(vectorDistance(myPos, pos) / (shotSpeed + Vector(filter.getMean()(1), filter.getMean()(4)).length()));
 		printf("\ntime: %f", time);
 		filter.predict(time+6.0, 0, &newGoal,false,false);
 		curGoal = Vector(newGoal(0), newGoal(3));
 		printf("\nNew: %f %f", curGoal.x, curGoal.y);
 		cout << "\nMean:\n" << filter.getMean() << endl;
 		//Vector dir = Vector(1, 1);
-		//plotKalmanFilter(filter, time + 6.5, 0, &pos, &dir);
+		plotKalmanFilter(filter, time + 6.0, 0, &pos, &Vector(filter.getMean()(1), filter.getMean()(4)));
 		myTeam->shoot(botIndex);
 		
 	}

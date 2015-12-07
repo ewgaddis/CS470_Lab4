@@ -3,6 +3,7 @@
 
 #include "team.h"
 #include "potentialFields.h"
+#include "kalmanFilter.h"
 
 class KalmanAgent {
 	BZRC* myTeam;
@@ -19,6 +20,7 @@ class KalmanAgent {
 	int shotTimer;
 	int timerMax;
 	Vector curGoal;
+	//KalmanFilter * filter;
 public: KalmanAgent(BZRC* team, int index);
 
 		void Update();
