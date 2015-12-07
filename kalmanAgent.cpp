@@ -119,6 +119,8 @@ void KalmanAgent::Update(){
 	double avgAngVel = angle - oldAngle;
 	oldAngle = angle;
 
+	Vector oldPos, agentVel, agentAvgVel;
+
 	if (angle > 0.0001 || angle < -0.0001)//(angle > 0.0000001 || angle < -0.0000001)
 	{
 		double newVel = (angle / (M_1_PI / 1.0)) + (100.0*avgAngVel); //(100.0*avgAngVel);
@@ -139,7 +141,7 @@ void KalmanAgent::Update(){
 		curTarget++;
 		bool validTarget = false;
 		while (!validTarget){
-			if (curTarget >= otherTanks.size()){
+			if (curTarget >= (int)otherTanks.size()){
 				otherTanks.clear();
 				myTeam->get_othertanks(&otherTanks);
 				curTarget = 0;
@@ -153,9 +155,9 @@ void KalmanAgent::Update(){
 		/*KalmanFilter filter(800.0, 0.01, 0.01,
 			0.1, 0.01, 0.01,
 			25.0);*/
-		KalmanFilter filter(1600.0, 400.0, 100.0,
-			0.1, 0.01, 25.0,
-			25.0);
+		KalmanFilter filter(1600.0, 800.0, 0.01,
+			0.01, 0.01, 0.01,
+			100.0);
 		//filter made->now hone in.
 		Vector pos(otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
 		printf("\nPos: %f %f tank: %s", pos.x, pos.y, otherTanks[curTarget].color.c_str());
@@ -165,10 +167,16 @@ void KalmanAgent::Update(){
 		z(0) = pos.x;
 		z(1) = pos.y;*/
 
+		agentAvgVel = Vector();
+
 		for (int i = 0; i < 30; ++i)
 		{
+			oldPos = pos;
 			pos.x = otherTanks[curTarget].pos[0];
 			pos.y = otherTanks[curTarget].pos[1];
+
+			agentAvgVel += (pos - oldPos) * (10.0 / 30.0);
+
 			printf("\nPos: %f %f tank: %s", pos.x, pos.y, otherTanks[curTarget].color.c_str());
 			VectorXd z(2);
 			z.fill(0.0);
@@ -182,7 +190,7 @@ void KalmanAgent::Update(){
 			curTarget = 0;
 			bool validTarget = false;
 			while (!validTarget){
-				if (curTarget >= otherTanks.size()){
+				if (curTarget >= (int)otherTanks.size()){
 					otherTanks.clear();
 					myTeam->get_othertanks(&otherTanks);
 					curTarget = 0;
@@ -196,6 +204,10 @@ void KalmanAgent::Update(){
 			Sleep(100);
 		}
 
+		agentVel = agentAvgVel;
+
+		static int kalmanNum = 0;
+
 		//time to make a prediction:
 		//curGoal = Vector(newX, newY);
 		VectorXd newGoal = VectorXd();
@@ -205,9 +217,13 @@ void KalmanAgent::Update(){
 		curGoal = Vector(newGoal(0), newGoal(3));
 		printf("\nNew: %f %f", curGoal.x, curGoal.y);
 		cout << "\nMean:\n" << filter.getMean() << endl;
+		cout << "velocity: " << agentVel << endl;
+		cout << "kalman #" << kalmanNum << endl;
 		//Vector dir = Vector(1, 1);
-		plotKalmanFilter(filter, time + 6.0, 0, &pos, &Vector(filter.getMean()(1), filter.getMean()(4)));
+		plotKalmanFilter(filter, time + 6.0, 0, &pos, &agentVel);
 		myTeam->shoot(botIndex);
+
+		kalmanNum++;
 		
 	}
 	//shotTimer--;
