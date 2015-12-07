@@ -217,9 +217,9 @@ void KalmanAgent::Update(){
 		//time to make a prediction:
 		//curGoal = Vector(newX, newY);
 		VectorXd newGoal = VectorXd();
-		double time = vectorDistance(myPos, pos) / (shotSpeed + Vector(filter.getMean()(1)*10, filter.getMean()(4)*10).length());
+		double time = 10*(vectorDistance(myPos, pos) / (shotSpeed + Vector(filter.getMean()(1), filter.getMean()(4)).length()));
 		printf("\ntime: %f", time);
-		filter.predict(time+6.5, 0, &newGoal,false,false);
+		filter.predict(time+6.0, 0, &newGoal,false,false);
 		curGoal = Vector(newGoal(0), newGoal(3));
 		printf("\nNew: %f %f", curGoal.x, curGoal.y);
 		cout << "\nMean:\n" << filter.getMean() << endl;
