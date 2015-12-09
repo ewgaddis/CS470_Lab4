@@ -131,6 +131,24 @@ void KalmanAgent::Update(){
 			else
 				validTarget = true;
 		}
+<<<<<<< HEAD
+=======
+		/*KalmanFilter filter(800.0, 0.01, 0.01,
+			0.1, 0.01, 0.01,
+			25.0);*/
+<<<<<<< HEAD
+		/*KalmanFilter filter(1600.0, 400.0, 100.0,
+			0.1, 0.01, 0.1,//25.0,
+			25.0);*/
+		KalmanFilter filter(800.0, 100.0, 1.0,
+			0.001, 0.001, 0.01,
+			50.0);
+=======
+		KalmanFilter filter(1600.0, 800.0, 0.01,
+			0.01, 0.01, 0.01,
+			100.0);
+>>>>>>> dbee8abc7a27233807a77c714eda6a6065525a0e
+>>>>>>> 3405a81e970c560de2b3a5d4ce5f22b16e1a0107
 		//filter made->now hone in.
 		Vector pos(otherTanks[curTarget].pos[0], otherTanks[curTarget].pos[1]);
 		printf("\nPos: %f %f tank: %s", pos.x, pos.y, otherTanks[curTarget].color.c_str());
@@ -181,7 +199,11 @@ void KalmanAgent::Update(){
 		//time to make a prediction:
 		//curGoal = Vector(newX, newY);
 		VectorXd newGoal = VectorXd();
+<<<<<<< HEAD
 		double time = 0.6*(vectorDistance(myPos, pos) / (shotSpeed + Vector(filter.getMean()(1), filter.getMean()(4)).length()));
+=======
+		double time = (vectorDistance(myPos, pos) / (shotSpeed + Vector(filter.getMean()(1), filter.getMean()(4)).length()));
+>>>>>>> 3405a81e970c560de2b3a5d4ce5f22b16e1a0107
 		printf("\ntime: %f", time);
 		filter.predict(time+6.0, 0, &newGoal,false,false);
 		curGoal = Vector(newGoal(0), newGoal(3));
