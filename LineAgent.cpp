@@ -2,8 +2,7 @@
 #include "geometry.h"
 #include <math.h>
 
-LineAgent::LineAgent(BZRC* team, int index){
-	myTeam = team;
+LineAgent::LineAgent(int index){
 	botIndex = index;
 	forward = true;
 	time = 0;

@@ -20,7 +20,6 @@ class KalmanAgent {
 	int shotTimer;
 	int timerMax;
 	Vector curGoal;
-	//KalmanFilter * filter;
 public: KalmanAgent(BZRC* team, int index);
 
 		void Update();

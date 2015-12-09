@@ -9,8 +9,9 @@ class LineAgent {
 	int botIndex;
 	bool forward;
 	int time;
-public: LineAgent(BZRC* team, int index);
+public: LineAgent(int index);
 
+		void setTeam(BZRC *team) { myTeam = team; }
 		void Update();
 private:
 };
